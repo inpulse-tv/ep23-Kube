@@ -1,0 +1,26 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bootstrap-db
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8
+        command: ["bash",  "mysql/bootstrap.sh"]
+        volumeMounts:
+          - name: bootstrap-mysql
+            mountPath: /mysql
+        env: 
+        - name: MYSQL_PWD
+          value: password
+        - name: MYSQL_HOST
+          value: mysql.default.svc.cluster.local
+      restartPolicy: Never
+      volumes:
+      - name: bootstrap-mysql
+        configMap:
+          name: bootstrap-mysql
